@@ -16,6 +16,7 @@ stages:
           - script: echo running unit tests
             displayName: Running Unit Tests
       - job: BuildReactApp
+        dependsOn: BuildMobileApp
         displayName: Build React App for dev
         steps:
           - script: echo building react application
@@ -23,6 +24,7 @@ stages:
           - script: echo running unit tests
             displayName: Running Unit Tests
       - job: BuildNodeApp
+        dependsOn: BuildReactApp
         displayName: Build Node App for dev
         steps:
           - script: echo building node application
@@ -30,6 +32,8 @@ stages:
           - script: echo running unit tests
             displayName: Running Unit Tests
   - stage: BuildStaging
+    dependsOn: BuildDev
+    condition: succeeded('BuildDev')
     displayName: Build for Staging
     jobs:
       - job: BuildMobileApp
@@ -40,6 +44,7 @@ stages:
           - script: echo running unit tests
             displayName: Running Unit Tests 
       - job: BuildReactApp
+        dependsOn: BuildMobileApp
         displayName: Build React App for staging
         steps:
           - script: echo building react application
@@ -47,6 +52,7 @@ stages:
           - script: echo running unit tests
             displayName: Running Unit Tests
       - job: BuildNodeApp
+        dependsOn: BuildReactApp
         displayName: Build Node App for staging
         steps:
           - script: echo building node application
@@ -54,6 +60,10 @@ stages:
           - script: echo running unit tests
             displayName: Running Unit Tests
   - stage: BuildProd
+    dependsOn:
+      - BuildDev
+      - BuildStaging
+    condition: and(succeeded('BuildDev'), succeeded('BuildStaging'))
     displayName: Build for Prod
     jobs:
       - job: BuildMobileApp
@@ -64,6 +74,7 @@ stages:
           - script: echo running unit tests
             displayName: Running Unit Tests 
       - job: BuildReactApp
+        dependsOn: BuildMobileApp
         displayName: Build React App for prod
         steps:
           - script: echo building react application
@@ -71,6 +82,7 @@ stages:
           - script: echo running unit tests
             displayName: Running Unit Tests
       - job: BuildNodeApp
+        dependsOn: BuildReactApp
         displayName: Build Node App for prod
         steps:
           - script: echo building node application
